@@ -44,6 +44,7 @@ type PoolWithFunc struct {
 	lock sync.Locker
 
 	// workers is a slice that store the available workers.
+	// task不同的参数
 	workers []*goWorkerWithFunc
 
 	// state is used to notice the pool to closed itself.
@@ -53,6 +54,7 @@ type PoolWithFunc struct {
 	cond *sync.Cond
 
 	// poolFunc is the function for processing tasks.
+	// 是处理任务的函数。
 	poolFunc func(interface{})
 
 	// workerCache speeds up the obtainment of a usable worker in function:retrieveWorker.

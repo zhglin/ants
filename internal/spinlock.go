@@ -10,10 +10,13 @@ import (
 	"sync/atomic"
 )
 
+// 自旋锁
 type spinLock uint32
 
+// 最大的重试次数
 const maxBackoff = 16
 
+// Lock 加锁
 func (sl *spinLock) Lock() {
 	backoff := 1
 	for !atomic.CompareAndSwapUint32((*uint32)(sl), 0, 1) {
@@ -21,12 +24,15 @@ func (sl *spinLock) Lock() {
 		for i := 0; i < backoff; i++ {
 			runtime.Gosched()
 		}
+
+		// 指数退避
 		if backoff < maxBackoff {
 			backoff <<= 1
 		}
 	}
 }
 
+// Unlock 释放锁
 func (sl *spinLock) Unlock() {
 	atomic.StoreUint32((*uint32)(sl), 0)
 }

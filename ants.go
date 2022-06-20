@@ -33,9 +33,11 @@ import (
 
 const (
 	// DefaultAntsPoolSize is the default capacity for a default goroutine pool.
+	// 是默认协程池的默认容量。
 	DefaultAntsPoolSize = math.MaxInt32
 
 	// DefaultCleanIntervalTime is the interval time to clean up goroutines.
+	// 是清理goroutines的间隔时间。
 	DefaultCleanIntervalTime = time.Second
 )
 
@@ -61,6 +63,7 @@ var (
 	ErrPoolClosed = errors.New("this pool has been closed")
 
 	// ErrPoolOverload will be returned when the pool is full and no workers available.
+	// 将在池满且没有可用的worker时返回。
 	ErrPoolOverload = errors.New("too many goroutines blocked on submit or Nonblocking is set")
 
 	// ErrInvalidPreAllocSize will be returned when trying to set up a negative capacity under PreAlloc mode.
@@ -74,22 +77,26 @@ var (
 	// workerChanCap determines whether the channel of a worker should be a buffered channel
 	// to get the best performance. Inspired by fasthttp at
 	// https://github.com/valyala/fasthttp/blob/master/workerpool.go#L139
+	// 确定worker的通道是否应该为缓冲通道以获得最佳性能
 	workerChanCap = func() int {
 		// Use blocking channel if GOMAXPROCS=1.
 		// This switches context from sender to receiver immediately,
 		// which results in higher performance (under go1.5 at least).
+		// 如果GOMAXPROCS=1，使用阻塞通道。 这将上下文立即从发送端切换到接收端，从而带来更高的性能(至少在go1.5下)。
 		if runtime.GOMAXPROCS(0) == 1 {
 			return 0
 		}
 
 		// Use non-blocking workerChan if GOMAXPROCS>1,
-		// since otherwise the sender might be dragged down if the receiver is CPU-bound.
+		// since otherwise the sender might be dragged down if the receiver is CPU-bound(计算密集型).
+		// 如果GOMAXPROCS>1，使用非阻塞的workerChan，因为如果接收端是cpu绑定的，发送端可能会被拖下。
 		return 1
 	}()
 
 	defaultLogger = Logger(log.New(os.Stderr, "", log.LstdFlags))
 
 	// Init an instance pool when importing ants.
+	// 初始化默认协程池
 	defaultAntsPool, _ = NewPool(DefaultAntsPoolSize)
 )
 
